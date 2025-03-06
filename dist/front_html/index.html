@@ -1,0 +1,31 @@
+<!DOCTYPE html> 
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontend</title>
+</head>
+<body>
+    <h1>Chat page</h1>
+    <button id="btn">Send a message to Client</button>
+
+    <script>
+        fetch(`/socket`)
+            .then(response => {
+                if(!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                } else {
+                    return response.json();
+                }
+            }) // 응답을 Json으로 파싱
+            .then(socketInfo => {           // 파싱된 데이터를 socketInfo에 저장
+                console.log(socketInfo);
+                // WebSocket을 사용하여 서버에 연결
+                const socket = new WebSocket(`${socketInfo.socketIP}:${socketInfo.socketPort}`)
+            })
+
+    </script>
+
+</body>
+</html>
