@@ -5,27 +5,96 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Frontend</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px 0;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        #messages {
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 4px;
+            min-height: 200px;
+        }
+    </style>
 </head>
 <body>
     <h1>Chat page</h1>
-    <button id="btn">Send a message to Client</button>
+    <button id="btn">Send a message to Server</button>
+    <div id="messages">
+        <p>Connection status will appear here...</p>
+    </div>
 
     <script>
+        let socket;
+        const messagesDiv = document.getElementById('messages');
+
+        function addMessage(text) {
+            const p = document.createElement('p');
+            p.textContent = text;
+            messagesDiv.appendChild(p);
+        }
+
         fetch(`/socket`)
             .then(response => {
                 if(!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    throw new Error(`HTTP error status : ${response.status}`);
                 } else {
                     return response.json();
                 }
             }) // 응답을 Json으로 파싱
-            .then(socketInfo => {           // 파싱된 데이터를 socketInfo에 저장
+            .then(socketInfo => { // 파싱된 데이터를 socketInfo에 저장
                 console.log(socketInfo);
+                addMessage(`소켓 정보: ${JSON.stringify(socketInfo)}`);
+
                 // WebSocket을 사용하여 서버에 연결
-                const socket = new WebSocket(`${socketInfo.socketIP}:${socketInfo.socketPort}`)
+                socket = new WebSocket(`${socketInfo.socketIP}:${socketInfo.socketPort}`);
+
+                socket.onopen = () => {
+                    console.log('Connected to Server');
+                    addMessage('서버에 연결되었습니다.');
+                };
+
+                socket.onerror = (error) => {
+                    console.error("WebSocket 오류:", error);
+                    addMessage(`WebSocket 오류: ${error}`);
+                };
+
+                socket.onmessage = (event) => {
+                    console.log("Message From Server : ", event.data);
+                    addMessage(`서버로부터 메시지: ${event.data}`);
+                    alert('Message From Server: ' + event.data); // alter 수정됨
+                };
+
+                document.getElementById('btn').addEventListener('click', () => {
+                    const message = 'Hello from Frontend';
+                    socket.send(message);
+                    addMessage(`보낸 메시지: ${message}`);
+                });
             })
-
+            .catch(error => {
+                console.error("Fetch 오류:", error);
+                addMessage(`Fetch 오류: ${error.message}`);
+            });
     </script>
-
 </body>
 </html>
