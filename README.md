@@ -4,6 +4,7 @@ JS WebSocket 공부 및 챗봇 구현
 1. JS를 통한 WebSocket 사용
 2. Socket에서 User를 통해 받은 Data를 OPEN API를 통해 챗봇 구현
 
+- [Socket Study Repo](https://congruous-porpoise-103.notion.site/SelfProject-Socket-1af79bdfce5a806597cbe96d15c1996c?pvs=4)
 ____
 
 ### 기본적인 설정 명령어
